@@ -55,7 +55,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.9.3
+          terraform_version: 1.10.5
 
       # Ensure AWS credentials are available for Terraform commands
       - name: Setup AWS Credentials
@@ -72,7 +72,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.9.3
+          terraform_version: 1.10.5
 
       # Initialize a new or existing Terraform working directory
       - name: Terraform Init
@@ -94,7 +94,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.9.3
+          terraform_version: 1.10.5
 
       - name: Terraform Format
         working-directory: eks
@@ -115,7 +115,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.9.3
+          terraform_version: 1.10.5
 
       - name: Terraform Init
         working-directory: eks
