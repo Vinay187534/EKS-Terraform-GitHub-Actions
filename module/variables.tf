@@ -1,4 +1,3 @@
-variable "aws-region" {}
 variable "env" {}
 variable "cluster-name" {}
 variable "cidr-block" {}
