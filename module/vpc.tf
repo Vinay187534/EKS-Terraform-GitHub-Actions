@@ -39,6 +39,7 @@ resource "aws_subnet" "public-subnet" {
     Env                                           = var.env
     "kubernetes.io/cluster/${local.cluster-name}" = "owned"
     "kubernetes.io/role/elb"                      = "1"
+    "kubernetes.io/cluster/${local.cluster-name}"  = "shared"
   }
 
   depends_on = [aws_vpc.vpc,
@@ -57,6 +58,7 @@ resource "aws_subnet" "private-subnet" {
     Env                                           = var.env
     "kubernetes.io/cluster/${local.cluster-name}" = "owned"
     "kubernetes.io/role/internal-elb"             = "1"
+    "kubernetes.io/cluster/${local.cluster-name}"  = "shared"
   }
 
   depends_on = [aws_vpc.vpc,
