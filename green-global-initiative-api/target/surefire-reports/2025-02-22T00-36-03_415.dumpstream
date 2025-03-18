@@ -1,0 +1,5 @@
+# Created at 2025-02-22T00:36:04.421
+Boot Manifest-JAR contains absolute paths in classpath 'D:\PM-Code\API\green-global-initiative\green-global-initiative-api\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
