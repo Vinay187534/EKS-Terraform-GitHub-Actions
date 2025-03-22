@@ -3,11 +3,11 @@ name: Deploy to EKS
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to the main branch (modify as necessary)
+      - main # Trigger deployment on push to main branch (modify as necessary)
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted runner]
 
     steps:
       # Step 1: Checkout the repository
@@ -27,12 +27,22 @@ jobs:
         run: |
           aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
 
-      # Step 4: Deploy Kubernetes Manifests to EKS
+      # Step 5: Deploy Kubernetes manifests
       - name: Deploy Kubernetes Manifests to EKS
         working-directory: ./Kubernetes-Manifest-Files
         run: |
-          kubectl create namespace three-tier || echo "Namespace already exists"
-          kubectl apply -f ./Kubernetes-Manifest-Files/
-          
-          # Optional: Verify if deployments are successful
-          kubectl get all --namespace three-tier
+          kubectl create namespace three-tier
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/dockersecret.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/secret.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/configmap.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/sql-configmap.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/pv.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/pvc.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend-ingress/backend-ingress.yaml
