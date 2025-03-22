@@ -31,17 +31,17 @@ jobs:
       - name: Deploy Kubernetes Manifests to EKS
         working-directory: ./Kubernetes-Manifest-Files
         run: |
-          kubectl apply -f ./Database/dockersecret.yaml
-          kubectl apply -f ./Database/secret.yaml
-          kubectl apply -f ./Database/configmap.yaml
-          kubectl apply -f ./Database/sql-configmap.yaml
-          kubectl apply -f ./Database/pv.yaml
-          kubectl apply -f ./Database/pvc.yaml
-          kubectl apply -f ./Database/deployment.yaml
-          kubectl apply -f ./Database/service.yaml
-          kubectl apply -f ./Backend/deployment.yaml
-          kubectl apply -f ./Backend/service.yaml
-          kubectl apply -f ./Frontend/deployment.yaml
-          kubectl apply -f ./Frontend/service.yaml
+         # kubectl apply -f ./Database/dockersecret.yaml
+         # kubectl apply -f ./Database/secret.yaml
+           kubectl apply -f ./Database/configmap.yaml
+         #  kubectl apply -f ./Database/sql-configmap.yaml
+         # kubectl apply -f ./Database/pv.yaml
+         # kubectl apply -f ./Database/pvc.yaml
+         #  kubectl apply -f ./Database/deployment.yaml
+         #  kubectl apply -f ./Database/service.yaml
+         #  kubectl apply -f ./Backend/deployment.yaml
+         #   kubectl apply -f ./Backend/service.yaml
+          kubectl apply -f ./frontend/deployment.yaml
+          kubectl apply -f ./frontend/service.yaml
           kubectl apply -f ./Frontend-ingress/frontend-ingress.yaml
           kubectl apply -f ./Backend-ingress/backend-ingress.yaml
