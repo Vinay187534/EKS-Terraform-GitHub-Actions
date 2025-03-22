@@ -3,7 +3,7 @@ name: Deploy to EKS
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to main branch (modify as necessary)
+      - main # Trigger deployment on push to main branch (modify as necessary)
 
 jobs:
   deploy:
@@ -31,4 +31,18 @@ jobs:
       - name: Deploy Kubernetes Manifests to EKS
         working-directory: ./Kubernetes-Manifest-Files
         run: |
-          kubectl apply -f .
+          kubectl create namespace three-tier
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/dockersecret.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/secret.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/configmap.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/sql-configmap.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/pv.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/pvc.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Database/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend/deployment.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend/service.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
+          kubectl apply -f ./Kubernetes-Manifest-Files/Backend-ingress/backend-ingress.yaml
