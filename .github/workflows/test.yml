@@ -1,0 +1,48 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - main # Trigger deployment on push to main branch (modify as necessary)
+
+jobs:
+  deploy:
+    runs-on: [self-hosted]
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up AWS credentials
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Configure kubectl for EKS
+      - name: Set up kubectl
+        run: |
+          aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
+
+      # Step 5: Deploy Kubernetes manifests
+      - name: Deploy Kubernetes Manifests to EKS
+        working-directory: ./Kubernetes-Manifest-Files
+        run: |
+          kubectl create namespace three-tier
+          kubectl apply -f ./Database/dockersecret.yaml
+          kubectl apply -f ./Database/secret.yaml
+          kubectl apply -f ./Database/configmap.yaml
+          kubectl apply -f ./Database/sql-configmap.yaml
+          kubectl apply -f ./Database/pv.yaml
+          kubectl apply -f ./Database/pvc.yaml
+          kubectl apply -f ./Database/deployment.yaml
+          kubectl apply -f ./Database/service.yaml
+          kubectl apply -f ./Backend/deployment.yaml
+          kubectl apply -f ./Backend/service.yaml
+          kubectl apply -f ./Frontend/deployment.yaml
+          kubectl apply -f ./Frontend/service.yaml
+          kubectl apply -f ./Frontend-ingress/frontend-ingress.yaml
+          kubectl apply -f ./Backend-ingress/backend-ingress.yaml
