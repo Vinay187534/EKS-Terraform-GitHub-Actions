@@ -31,6 +31,7 @@ jobs:
       - name: Deploy Kubernetes Manifests to EKS
         working-directory: ./Kubernetes-Manifest-Files
         run: |
+          kubectl create namespace three-tier
           kubectl apply -f ./Database/dockersecret.yaml
           kubectl apply -f ./Database/secret.yaml
           kubectl apply -f ./Database/configmap.yaml
