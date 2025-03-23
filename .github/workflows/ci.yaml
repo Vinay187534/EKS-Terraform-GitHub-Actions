@@ -88,7 +88,7 @@ jobs:
 
       # Step 7: Install Snyk CLI
       - name: Install Snyk CLI
-        run: npm install -g snyk
+        run: sudo npm install -g snyk
 
       # Step 8: Snyk Security Scans for Java
       - name: Snyk Security Scans
