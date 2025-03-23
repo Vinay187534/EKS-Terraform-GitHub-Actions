@@ -172,8 +172,8 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         working-directory: /home/ubuntu/actions-runner/frontend/green-global-initiative/green-global-initiative/green-global-initiative-api
         run: |
-          npm install -g snyk
-          snyk test --severity-threshold=high
+          sudo npm install -g snyk
+          sudo snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
  
