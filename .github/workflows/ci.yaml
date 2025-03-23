@@ -54,7 +54,7 @@ jobs:
 
       # Step 4: Build and test with Maven (from your code directory)
       - name: Build and test with Maven
-        run: mvn clean install -DskipTests -X
+        run: mvn clean package -Dspring.profiles.active=development -DskipTests --no-transfer-progress
         working-directory: ./green-global-initiative-api
 
 
