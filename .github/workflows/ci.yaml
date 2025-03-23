@@ -170,7 +170,7 @@ jobs:
 
       # Snyk Integration
       - name: Run Snyk to check for vulnerabilities
-        working-directory: /home/ubuntu/actions-runner/deploy-backend/green-global-initiative/green-global-initiative/green-global-initiative-api
+        working-directory: /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api
         run: |
           sudo npm install -g snyk
           sudo snyk test --severity-threshold=high
