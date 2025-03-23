@@ -17,6 +17,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
       # Step 1: Checkout the repository
@@ -80,13 +81,13 @@ jobs:
       # Step 7: Install Snyk CLI
       - name: Install Snyk CLI
         run: |
-          sudo npm install -g snyk  # Install Snyk CLI globally using npm
+          npm install -g snyk  # Install Snyk CLI globally using npm
           snyk --version  # Verify the Snyk CLI installation
 
       # Step 8: Authenticate Snyk
       - name: Authenticate with Snyk
         run: |
-          snyk auth $SNYK_TOKEN  # Authenticate with Snyk using the Snyk API token stored in GitHub Secrets
+          snyk auth ${{ secrets.SNYK_TOKEN }}  # Authenticate with Snyk using the Snyk API token stored in GitHub Secrets
 
       # Step 9: Snyk Dependency Check
       - name: Snyk Dependency Check
