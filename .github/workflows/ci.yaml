@@ -107,12 +107,31 @@ jobs:
         working-directory: ./green-global-initiative-api
         run: ls -la
 
+      # # Step 4: Run Snyk Test on the project
+      # - name: Run Snyk Test
+      #   run: snyk test
+      #   working-directory: ./green-global-initiative-api
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Use the Snyk API token from GitHub Secrets
+
       # Step 4: Run Snyk Test on the project
-      - name: Run Snyk Test
-        run: snyk test
+      - name: Scan pom.xml
+        run: snyk test --file=pom.xml
         working-directory: ./green-global-initiative-api
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Use the Snyk API token from GitHub Secrets
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+ 
+      - name: Scan Dockerfile
+        run: snyk test --file=Dockerfile
+        working-directory: ./green-global-initiative-api
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+ 
+      - name: Scan init.sql
+        run: snyk iac test --file=init.sql
+        working-directory: ./green-global-initiative-api
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Step 5: Monitor results and upload to Snyk dashboard
       - name: Monitor Project in Snyk Dashboard
