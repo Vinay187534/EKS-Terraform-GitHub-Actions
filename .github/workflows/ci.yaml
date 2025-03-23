@@ -57,21 +57,17 @@ jobs:
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: ./green-global-initiative-api
 
-      # # Step 6: SonarQube scan (optional step for code quality)
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarcloud-github-action@v1
-      #   with:
-      #     sonar-token: ${{ secrets.SONARQUBE_TOKEN }}
-      #   env:
-      #     SONARQUBE_HOST_URL: https://sonarcloud.io
-      #     SONARQUBE_PROJECT_KEY: three-tier-backend
-      #     SONARQUBE_PROJECT_NAME: three-tier-backend
-      #   working-directory: green-global-initiative/green-global-initiative-api
-
-      # Step 7: Trivy file scan (for backend)
+      # Step 6: Trivy file scan (for backend)
       - name: Trivy File Scan
         run: |
           trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
+
+      # Step 7: Upload Trivy File Scan Results as artifact
+      - name: Upload Trivy File Scan Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivyfs-backend
+          path: trivyfs-backend.txt
 
       # Step 8: Docker Image Build for Backend
       - name: Docker Build Backend Image
@@ -87,12 +83,19 @@ jobs:
           docker tag ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
           docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
-     #  Step 10: Trivy Docker Image Scan
+      # Step 10: Trivy Docker Image Scan
       - name: Trivy Image Scan
         run: |
           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
-      # Step 11: Update Deployment Image in YAML
+      # Step 11: Upload Trivy Image Scan Results as artifact
+      - name: Upload Trivy Image Scan Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivyimage-backend
+          path: trivyimage-backend.txt
+
+      # Step 12: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
         run: |
           IMAGE_TAG=${GITHUB_SHA}
@@ -104,7 +107,7 @@ jobs:
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
   # Job 2: Deploy to Kubernetes (EKS)
-  # # deploy:
+  # deploy:
   #   needs: build # Ensure that the deploy job runs only after the build job completes
   #   runs-on: [self-hosted]
   #   env:
