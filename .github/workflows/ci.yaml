@@ -128,31 +128,31 @@ jobs:
       #       echo "Snyk authentication failed"
       #       exit 1
       #     fi
+      
+      # Snyk Integration
+      - name: Run Snyk to check for vulnerabilities
+        working-directory: /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api
+        continue-on-error: true
+        run: |
+          sudo npm install -g snyk
+          sudo snyk test --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      # # Step 3: List Snyk organizations
-      # - name: List Snyk organizations
-      #   run: sudo snyk orgs
+      # Step 8: Snyk Security Scans for Java
+      - name: Snyk Security Scans
+        run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-apigreen-global-initiative-api/pom.xml --debug
+        continue-on-error: false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
 
-      # - name: List Snyk Organizations
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   run: |
-      #     echo "Listing Snyk organizations..."
-      #     curl -s -H "Authorization: token $SNYK_TOKEN" https://api.snyk.io/v1/orgs | jq '.data[] | {name: .attributes.name, id: .id}'
-
-      # # Step 8: Snyk Security Scans for Java
-      # - name: Snyk Security Scans
-      #   run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
-      #   continue-on-error: true
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   working-directory: ./green-global-initiative-api
-
-      # - name: Snyk Monitor
-      #   run: snyk monitor --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   working-directory: ./green-global-initiative-api
+      - name: Snyk Monitor
+        run: snyk monitor --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml --debug
+        continue-on-error: false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
 
       # # Step 9: Snyk security scan step for Code Scanning
       # - name: Run Snyk to check for vulnerabilities
@@ -168,14 +168,7 @@ jobs:
       #     sarif_file: snyk.sarif
       #     category: "Snyk OpenSource Unique Category"
 
-      # Snyk Integration
-      - name: Run Snyk to check for vulnerabilities
-        working-directory: /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api
-        run: |
-          sudo npm install -g snyk
-          sudo snyk test --severity-threshold=high
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
  
 
       # Step 9: Trivy file scan (for backend)
