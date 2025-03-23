@@ -43,11 +43,6 @@ jobs:
           maven-version: "3.8.7" # Adjust as necessary
           distribution: "temurin" # Same distribution as for Java
 
-      # Step 4: Build and test with Maven (from your code directory)
-      - name: Build and test with Maven
-        run: mvn clean package -DskipTests=false --no-transfer-progress
-        working-directory: ./green-global-initiative-api
-
       # Step 5: Cache Maven dependencies
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -56,6 +51,13 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      # Step 4: Build and test with Maven (from your code directory)
+      - name: Build and test with Maven
+        run: mvn clean install -DskipTests -X
+        working-directory: ./green-global-initiative-api
+
+
 
       # # Step 6: SonarQube scan (optional step for code quality)
       # - name: SonarQube Scan
