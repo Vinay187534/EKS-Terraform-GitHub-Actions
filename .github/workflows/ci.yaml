@@ -95,6 +95,13 @@ jobs:
       #     name: trivyimage-backend
       #     path: ./trivyimage-backend.txt
 
+      # Step: 11: Verify Repository Access
+      - name: Verify Repository Access
+        run: |
+          git config --global user.email "L00187534@atu.ie"
+          git config --global user.name "vinay187534"
+          git ls-remote https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }}
+
       # Step 12: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
         run: |
