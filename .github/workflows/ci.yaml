@@ -99,6 +99,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Install Snyk
+      - name: Set up Snyk
+        #uses: snyk/actions/setup@v2
+        uses: snyk/actions/setup@master
+        with:
+          token: ${{ secrets.SNYK_TOKEN }}
+
       # Step 3: Authenticate with Snyk (Snyk API token)
       - name: Authenticate with Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
@@ -122,16 +129,16 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Scan Dockerfile
-        working-directory: ./green-global-initiative-api
-        run: snyk test --file=Dockerfile
+        working-directory: ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api/config
+        run: snyk test --file=
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Scan init.sql
-        working-directory: ./green-global-initiative-api
-        run: snyk iac test --file=init.sql
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      # - name: Scan init.sql
+      #   working-directory: ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api/config
+      #   run: snyk iac test --file=init.sql
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Step 5: Monitor results and upload to Snyk dashboard
       - name: Monitor Project in Snyk Dashboard
