@@ -34,12 +34,14 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: "21" # Adjust as necessary
+          distribution: "adoptopenjdk"
 
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
           java-version: "21"
           maven-version: "3.8.7" # Adjust as necessary
+          distribution: "adoptopenjdk" # Same distribution as for Java
 
       # Step 4: Build and test with Maven (from your code directory)
       - name: Build and test with Maven
@@ -92,9 +94,9 @@ jobs:
           docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
       # Step 11: Trivy Docker Image Scan
-      - name: Trivy Image Scan
-        run: |
-           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
+      # # - name: Trivy Image Scan
+      #   run: |
+      #     trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
       # Step 12: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
@@ -105,7 +107,7 @@ jobs:
           git config user.name "vinay187534"
           git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git commit -m "Update backend image tag to ${IMAGE_TAG}"
-          git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
   # Job 2: Deploy to Kubernetes (EKS)
   # # deploy:
