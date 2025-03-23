@@ -81,6 +81,7 @@ jobs:
       - name: Install Snyk CLI
         run: |
           npm install -g snyk  # Install Snyk CLI globally using npm
+          snyk --version  # Verify the Snyk CLI installation
 
       # Step 8: Authenticate Snyk
       - name: Authenticate with Snyk
