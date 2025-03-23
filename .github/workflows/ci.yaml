@@ -78,74 +78,37 @@ jobs:
       #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
       #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
 
-      # # Step 7: Install Snyk CLI
-      # - name: Install Snyk CLI
-      #   run: |
-      #     sudo npm install -g snyk  # Install Snyk CLI globally using npm
-      #     snyk --version  # Verify the Snyk CLI installation
-
-      # # Step 8: Authenticate Snyk
-      # - name: Authenticate with Snyk
-      #   run: |
-      #     snyk auth ${{ secrets.SNYK_TOKEN }}  # Authenticate with Snyk using the Snyk API token stored in GitHub Secrets
-
-      # # Step 9: Snyk Dependency Check
-      # - name: Snyk Dependency Check
-      #   run: |
-      #     snyk test --all-projects  # Test all projects for vulnerabilities in dependencies
-      #   working-directory: ./green-global-initiative-api
-
       # Step 1: Checkout the code/Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install Snyk
-      - name: Set up Snyk
-        #uses: snyk/actions/setup@v2
-        uses: snyk/actions/setup@master
+      - name: Snyk Security Scans
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions'
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
+
+      - name: Snyk Monitor
+        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
+
+      # Snyk security scan step for Code Scanning
+
+      - name: Run Snyk to check for vulnerabilitie
+        uses: snyk/actions/node@master
+        continue-on-error: true
         with:
-          token: ${{ secrets.SNYK_TOKEN }}
-
-      # Step 3: Authenticate with Snyk (Snyk API token)
-      - name: Authenticate with Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
-      - name: List Files in Directory
-        working-directory: ./green-global-initiative-api
-        run: ls -la
-
-      # # Step 4: Run Snyk Test on the project
-      # - name: Run Snyk Test
-      #   run: snyk test
-      #   working-directory: ./green-global-initiative-api
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Use the Snyk API token from GitHub Secrets
-
-      # Step 4: Run Snyk Test on the project
-      - name: Scan pom.xml
-        working-directory: ./green-global-initiative-api
-        run: snyk test --file=pom.xml
+          args: ./green-global-initiative-api --sarif-file-output=snyk.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Scan Dockerfile
-        working-directory: ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api/config
-        run: snyk test --file=
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      # - name: Scan init.sql
-      #   working-directory: ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api/config
-      #   run: snyk iac test --file=init.sql
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      # Step 5: Monitor results and upload to Snyk dashboard
-      - name: Monitor Project in Snyk Dashboard
-        run: snyk monitor --file=package.json --file=yarn.lock
-        working-directory: ./green-global-initiative-api
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Upload SARIF to GitHub Security Center
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+          category: "Snyk OpenSource Unique Category"
 
       # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
