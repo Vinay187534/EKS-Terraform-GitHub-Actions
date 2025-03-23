@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: [self-hosted]
+    permissions:
+      contents: write
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
