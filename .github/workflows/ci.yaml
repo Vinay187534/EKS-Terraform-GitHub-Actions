@@ -58,7 +58,6 @@ jobs:
 
       # Step 6: Ensure mvnw is executable (fix the permission issue)
       - name: Ensure mvnw is executable
-        working-directory: ./green-global-initiative-api
         run: sudo chmod +x ./green-global-initiative-api/mvnw
 
       # Step 7: List files in the directory
