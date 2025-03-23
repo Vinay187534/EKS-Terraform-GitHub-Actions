@@ -62,7 +62,7 @@ jobs:
         run: |
           trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
 
-      # Step 7: Upload Trivy File Scan Results as artifact
+      # Step 7: Upload Trivy File Scan Results in artifact
       - name: Upload Trivy File Scan Results
         uses: actions/upload-artifact@v3
         with:
@@ -88,7 +88,7 @@ jobs:
         run: |
           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
-      # Step 11: Upload Trivy Image Scan Results as artifact
+      # Step 11: Upload Trivy Image Scan Results in artifact
       - name: Upload Trivy Image Scan Results
         uses: actions/upload-artifact@v3
         with:
