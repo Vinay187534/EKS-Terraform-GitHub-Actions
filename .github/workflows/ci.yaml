@@ -61,33 +61,21 @@ jobs:
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: ./green-global-initiative-api
 
-      # Step 7: SonarQube scan (optional step for code quality)
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarcloud-github-action@v1
-      #   with:
-      #     sonar-token: ${{ secrets.SONARQUBE_TOKEN }}
-      #   env:
-      #     SONARQUBE_HOST_URL: https://sonarcloud.io
-      #     SONARQUBE_PROJECT_KEY: three-tier-backend
-      #     SONARQUBE_PROJECT_NAME: three-tier-backend
-      #   working-directory: green-global-initiative/green-global-initiative-api
-
-      # # Step 8: OWASP Dependency-Check Scan
-      # - name: OWASP Dependency-Check Scan
-      #   run: |
-      #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
-      #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
-
       # Step 7: Install Snyk CLI
       - name: Install Snyk CLI
         run: |
           sudo npm install -g snyk  # Install Snyk CLI globally using npm
           snyk --version  # Verify the Snyk CLI installation
 
+      # Debug: Print the SNYK_TOKEN (to ensure it's correctly set)
+      - name: Debug Snyk Authentication
+        run: echo "SNYK_TOKEN=${{ secrets.SNYK_TOKEN }}"
+
       # Step 8: Authenticate Snyk
       - name: Authenticate with Snyk
         run: |
           snyk auth ${{ secrets.SNYK_TOKEN }}  # Authenticate with Snyk using the Snyk API token stored in GitHub Secrets
+          snyk whoami  # Verify the authentication was successful
 
       # Step 9: Snyk Dependency Check
       - name: Snyk Dependency Check
@@ -142,55 +130,3 @@ jobs:
         run: |
           kubectl rollout restart deployment backend -n three-tier  # Replace <namespace> with your actual namespace
           kubectl rollout status deployment backend -n <namespace>
-
-  # Job 2: Deploy to Kubernetes (EKS)
-  # deploy:
-  #   needs: build # Ensure that the deploy job runs only after the build job completes
-  #   runs-on: [self-hosted]
-  #   env:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     AWS_REGION: ${{ secrets.AWS_REGION }}
-  #     DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #     DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-  #   steps:
-  #     # Step 1: Checkout the repository
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v2
-
-  #     # Step 2: Set up AWS credentials
-  #     - name: Set up AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-
-  #     # Step 3: Set up kubectl for EKS
-  #     - name: Set up kubectl
-  #       run: |
-  #         aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
-
-  #     # Step 4: Set up eksctl
-  #     - name: Set up eksctl
-  #       uses: eksctl/eksctl-action@v1
-
-  #     # Step 5: Deploy Kubernetes Manifests to EKS
-  #     - name: Deploy Kubernetes Manifests to EKS
-  #       working-directory: ./Kubernetes-Manifest-Files
-  #       run: |
-  #         kubectl create namespace three-tier || echo "Namespace already exists"
-  #         kubectl apply -f ./Database/dockersecret.yaml
-  #         kubectl apply -f ./Database/secret.yaml
-  #         kubectl apply -f ./Database/configmap.yaml
-  #         kubectl apply -f ./Database/sql-configmap.yaml
-  #         kubectl apply -f ./Database/pv.yaml
-  #         kubectl apply -f ./Database/pvc.yaml
-  #         kubectl apply -f ./Database/deployment.yaml
-  #         kubectl apply -f ./Database/service.yaml
-  #         kubectl apply -f ./Backend/deployment.yaml
-  #         kubectl apply -f ./Backend/service.yaml
-  #         kubectl apply -f ./frontend/deployment.yaml
-  #         kubectl apply -f ./frontend/service.yaml
-  #         kubectl apply -f ./Frontend-ingress/frontend-ingress.yaml
-  #         kubectl apply -f ./Backend-ingress/backend-ingress.yaml
