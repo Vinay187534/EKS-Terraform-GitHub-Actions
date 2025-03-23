@@ -33,9 +33,10 @@ services:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/nausicaa_global_green_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_PROFILE: development  # Set the profile at runtime
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_PROFILE: development  # Set the profile at runtime
+      JWT_SECRET: secret
     ports:
       - "8080:8080"
     networks:
