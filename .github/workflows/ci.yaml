@@ -99,13 +99,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install dependencies (e.g., for a Node.js project)
-      - name: Install dependencies
-        run: npm install
-
       # Step 3: Authenticate with Snyk (Snyk API token)
       - name: Authenticate with Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: List Files in Directory
+        run: ls -la
 
       # Step 4: Run Snyk Test on the project
       - name: Run Snyk Test
@@ -116,7 +115,7 @@ jobs:
 
       # Step 5: Monitor results and upload to Snyk dashboard
       - name: Monitor Project in Snyk Dashboard
-        run: snyk monitor #--file=package.json --file=yarn.lock
+        run: snyk monitor --file=package.json --file=yarn.lock
         working-directory: ./green-global-initiative-api
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
