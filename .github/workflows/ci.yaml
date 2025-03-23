@@ -87,32 +87,32 @@ jobs:
       #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
       #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
 
-      # Step 1: Checkout the code/Check out the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # Step 7: Install Snyk CLI
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
+      # Step 8: Snyk Security Scans for Java
       - name: Snyk Security Scans
-        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions'
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
       - name: Snyk Monitor
-        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions'
+        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
-      # Snyk security scan step for Code Scanning
-
-      - name: Run Snyk to check for vulnerabilitie
-        uses: snyk/actions/node@master
+      # Step 9: Snyk security scan step for Code Scanning
+      - name: Run Snyk to check for vulnerabilities
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --sarif-file-output=snyk.sarif
         continue-on-error: true
-        with:
-          args: ./green-global-initiative-api --sarif-file-output=snyk.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
+
       - name: Upload SARIF to GitHub Security Center
         uses: github/codeql-action/upload-sarif@v3
         with:
