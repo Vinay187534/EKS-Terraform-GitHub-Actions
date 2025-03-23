@@ -87,9 +87,9 @@ jobs:
       #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
       #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
 
-      # Step 7: Install Snyk CLI
-      - name: Install Snyk CLI
-        run: sudo npm install -g snyk
+      # # Step 7: Install Snyk CLI
+      # - name: Install Snyk CLI
+      #   run: sudo npm install -g snyk
 
       # Step 8: Snyk Security Scans for Java
       - name: Snyk Security Scans
