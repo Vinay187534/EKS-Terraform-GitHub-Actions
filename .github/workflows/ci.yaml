@@ -20,6 +20,18 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
+
+      # Step to check if folder exists and remove it
+      - name: Remove folder if it exists
+        run: |
+          if [ -d "/home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/.mvn" ]; then
+            sudo rm -rf /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/.mvn
+            echo "Folder deleted."
+          else
+            echo "Folder does not exist. Skipping deletion."
+          fi
+        shell: bash
+
       # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v2
