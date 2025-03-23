@@ -57,7 +57,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Generate Maven Wrapper
-        run: ./mvnw -N io.takari:maven:wrapper
+        run: sudo mvn -N io.takari:maven:wrapper
         working-directory: ./green-global-initiative-api
 
       # Step 6: Ensure mvnw is executable (fix the permission issue)
