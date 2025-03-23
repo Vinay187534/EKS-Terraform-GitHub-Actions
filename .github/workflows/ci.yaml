@@ -62,12 +62,12 @@ jobs:
         run: |
           trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
 
-      # Step 7: Upload Trivy File Scan Results in artifact
+      # Step 7: Upload Trivy File Scan Results as artifact
       - name: Upload Trivy File Scan Results
         uses: actions/upload-artifact@v2
         with:
           name: trivyfs-backend
-          path: trivyfs-backend.txt
+          path: ./trivyfs-backend.txt
 
       # Step 8: Docker Image Build for Backend
       - name: Docker Build Backend Image
@@ -88,12 +88,12 @@ jobs:
         run: |
           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
-      # Step 11: Upload Trivy Image Scan Results in artifact
+      # Step 11: Upload Trivy Image Scan Results as artifact
       - name: Upload Trivy Image Scan Results
         uses: actions/upload-artifact@v2
         with:
           name: trivyimage-backend
-          path: trivyimage-backend.txt
+          path: ./trivyimage-backend.txt
 
       # Step 12: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
