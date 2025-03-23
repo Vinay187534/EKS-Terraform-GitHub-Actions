@@ -141,14 +141,14 @@ jobs:
 
       # Step 8: Snyk Security Scans for Java
       - name: Snyk Security Scans
-        run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-apigreen-global-initiative-api/pom.xml --debug
+        run: snyk test --org=vinaypo --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-apigreen-global-initiative-api/pom.xml
         continue-on-error: false
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
       - name: Snyk Monitor
-        run: snyk monitor --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml --debug
+        run: snyk monitor --org=vinaypo --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml
         continue-on-error: false
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
