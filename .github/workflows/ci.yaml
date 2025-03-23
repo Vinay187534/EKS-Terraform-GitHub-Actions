@@ -58,6 +58,7 @@ jobs:
 
       # Step 6: Ensure mvnw is executable (fix the permission issue)
       - name: Ensure mvnw is executable
+        # working-directory: ./green-global-initiative-api
         run: sudo chmod +x ./green-global-initiative-api/mvnw
 
       # Step 7: List files in the directory
@@ -88,25 +89,25 @@ jobs:
 
       # Step 7: Install Snyk CLI
       - name: Install Snyk CLI
-        run: sudo npm install -g snyk
+        run: npm install -g snyk
 
       # Step 8: Snyk Security Scans for Java
       - name: Snyk Security Scans
-        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml --debug
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
       - name: Snyk Monitor
-        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml
+        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml --debug
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
       # Step 9: Snyk security scan step for Code Scanning
       - name: Run Snyk to check for vulnerabilities
-        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --sarif-file-output=snyk.sarif
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./green-global-initiative-api/pom.xml --sarif-file-output=snyk.sarif
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
