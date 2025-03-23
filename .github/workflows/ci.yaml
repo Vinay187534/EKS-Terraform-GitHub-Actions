@@ -107,66 +107,76 @@ jobs:
       # - name: Install Snyk CLI
       #   run: sudo npm install -g snyk
 
-      # Step 7: Check if Snyk CLI is installed
-      - name: Check Snyk CLI installation
-        run: |
-          if ! sudo command -v snyk &> /dev/null; then
-            echo "Snyk CLI is not installed. Installing now..."
-            sudo npm install -g snyk
-          else
-            echo "Snyk CLI is already installed."
-            sudo snyk --version
-          fi
+      # # Step 7: Check if Snyk CLI is installed
+      # - name: Check Snyk CLI installation
+      #   run: |
+      #     if ! sudo command -v snyk &> /dev/null; then
+      #       echo "Snyk CLI is not installed. Installing now..."
+      #       sudo npm install -g snyk
+      #     else
+      #       echo "Snyk CLI is already installed."
+      #       sudo snyk --version
+      #     fi
 
-      - name: Authenticate Snyk CLI
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+      # - name: Authenticate Snyk CLI
+      #   run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-      - name: Verify Snyk Authentication
-        run: |
-          sudo snyk auth ${{ secrets.SNYK_TOKEN }}
-          if [ $? -ne 0 ]; then
-            echo "Snyk authentication failed"
-            exit 1
-          fi
+      # - name: Verify Snyk Authentication
+      #   run: |
+      #     sudo snyk auth ${{ secrets.SNYK_TOKEN }}
+      #     if [ $? -ne 0 ]; then
+      #       echo "Snyk authentication failed"
+      #       exit 1
+      #     fi
 
-      # Step 3: List Snyk organizations
-      - name: List Snyk organizations
-        run: sudo snyk orgs
+      # # Step 3: List Snyk organizations
+      # - name: List Snyk organizations
+      #   run: sudo snyk orgs
 
-      - name: List Snyk Organizations
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          echo "Listing Snyk organizations..."
-          curl -s -H "Authorization: token $SNYK_TOKEN" https://api.snyk.io/v1/orgs | jq '.data[] | {name: .attributes.name, id: .id}'
+      # - name: List Snyk Organizations
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   run: |
+      #     echo "Listing Snyk organizations..."
+      #     curl -s -H "Authorization: token $SNYK_TOKEN" https://api.snyk.io/v1/orgs | jq '.data[] | {name: .attributes.name, id: .id}'
 
-      # Step 8: Snyk Security Scans for Java
-      - name: Snyk Security Scans
-        run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        working-directory: ./green-global-initiative-api
+      # # Step 8: Snyk Security Scans for Java
+      # - name: Snyk Security Scans
+      #   run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
+      #   continue-on-error: true
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   working-directory: ./green-global-initiative-api
 
-      - name: Snyk Monitor
-        run: snyk monitor --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        working-directory: ./green-global-initiative-api
+      # - name: Snyk Monitor
+      #   run: snyk monitor --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --debug
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   working-directory: ./green-global-initiative-api
 
-      # Step 9: Snyk security scan step for Code Scanning
+      # # Step 9: Snyk security scan step for Code Scanning
+      # - name: Run Snyk to check for vulnerabilities
+      #   run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --sarif-file-output=snyk.sarif
+      #   continue-on-error: true
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   working-directory: ./green-global-initiative-api
+
+      # - name: Upload SARIF to GitHub Security Center
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: snyk.sarif
+      #     category: "Snyk OpenSource Unique Category"
+
+      # Snyk Integration
       - name: Run Snyk to check for vulnerabilities
-        run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --sarif-file-output=snyk.sarif
-        continue-on-error: true
+        working-directory: /home/ubuntu/actions-runner/frontend/green-global-initiative/green-global-initiative/green-global-initiative-api
+        run: |
+          npm install -g snyk
+          snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        working-directory: ./green-global-initiative-api
-
-      - name: Upload SARIF to GitHub Security Center
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: snyk.sarif
-          category: "Snyk OpenSource Unique Category"
+ 
 
       # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
