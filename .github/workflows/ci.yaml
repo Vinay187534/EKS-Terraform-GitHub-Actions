@@ -34,14 +34,14 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: "21" # Adjust as necessary
-          distribution: "adoptopenjdk"
+          distribution: "temurin"
 
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
           java-version: "21"
           maven-version: "3.8.7" # Adjust as necessary
-          distribution: "adoptopenjdk" # Same distribution as for Java
+          distribution: "temurin"
 
       # Step 4: Build and test with Maven (from your code directory)
       - name: Build and test with Maven
