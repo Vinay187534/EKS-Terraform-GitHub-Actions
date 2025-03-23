@@ -64,7 +64,7 @@ jobs:
 
       # Step 7: Upload Trivy File Scan Results in artifact
       - name: Upload Trivy File Scan Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: trivyfs-backend
           path: trivyfs-backend.txt
@@ -90,7 +90,7 @@ jobs:
 
       # Step 11: Upload Trivy Image Scan Results in artifact
       - name: Upload Trivy Image Scan Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: trivyimage-backend
           path: trivyimage-backend.txt
