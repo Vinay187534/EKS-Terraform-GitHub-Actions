@@ -65,7 +65,7 @@ jobs:
       - name: Install Snyk CLI
         run: |
           sudo npm install -g snyk  # Install Snyk CLI globally using npm
-          snyk --version  # Verify the Snyk CLI installation
+          sudo snyk --version  # Verify the Snyk CLI installation
 
       # Debug: Print the SNYK_TOKEN (to ensure it's correctly set)
       - name: Debug Snyk Authentication
