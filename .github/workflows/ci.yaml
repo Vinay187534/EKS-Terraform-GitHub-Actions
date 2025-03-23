@@ -43,21 +43,19 @@ jobs:
           maven-version: "3.8.7" # Adjust as necessary
           distribution: "temurin" # Same distribution as for Java
 
-      # # Step 5: Cache Maven dependencies
-      # - name: Cache Maven dependencies
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.m2/repository
-      #     key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-maven-
+      # Step 4: Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-      # # Step 4: Build and test with Maven (from your code directory)
-      # - name: Build and test with Maven
-      #   run: mvn clean package -Dspring.profiles.active=development -DskipTests --no-transfer-progress
-      #   working-directory: ./green-global-initiative-api
-
-
+      # Step 5: Build and test with Maven (from your code directory)
+      - name: Build and test with Maven
+        run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
+        working-directory: ./green-global-initiative-api
 
       # # Step 6: SonarQube scan (optional step for code quality)
       # - name: SonarQube Scan
@@ -70,37 +68,31 @@ jobs:
       #     SONARQUBE_PROJECT_NAME: three-tier-backend
       #   working-directory: green-global-initiative/green-global-initiative-api
 
-      # # Step 7: OWASP Dependency-Check Scan
-      # - name: OWASP Dependency-Check Scan
-      #   run: |
-      #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
-      #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
-
-      # Step 8: Trivy file scan (for backend)
+      # Step 7: Trivy file scan (for backend)
       - name: Trivy File Scan
         run: |
           trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
 
-      # Step 9: Docker Image Build for Backend
+      # Step 8: Docker Image Build for Backend
       - name: Docker Build Backend Image
         run: |
           docker system prune -f
           docker container prune -f
           docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
 
-      # Step 10: Push Docker Image to Docker Hub
+      # Step 9: Push Docker Image to Docker Hub
       - name: Push Docker Image to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
           docker tag ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
           docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
-      # Step 11: Trivy Docker Image Scan
+     #  Step 10: Trivy Docker Image Scan
       - name: Trivy Image Scan
         run: |
-         trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
+          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
-      # Step 12: Update Deployment Image in YAML
+      # Step 11: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
         run: |
           IMAGE_TAG=${GITHUB_SHA}
@@ -109,7 +101,7 @@ jobs:
           git config user.name "vinay187534"
           git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git commit -m "Update backend image tag to ${IMAGE_TAG}"
-          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
   # Job 2: Deploy to Kubernetes (EKS)
   # # deploy:
