@@ -43,19 +43,19 @@ jobs:
           maven-version: "3.8.7" # Adjust as necessary
           distribution: "temurin" # Same distribution as for Java
 
-      # Step 5: Cache Maven dependencies
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      # # Step 5: Cache Maven dependencies
+      # - name: Cache Maven dependencies
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.m2/repository
+      #     key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-maven-
 
-      # Step 4: Build and test with Maven (from your code directory)
-      - name: Build and test with Maven
-        run: mvn clean package -Dspring.profiles.active=development -DskipTests --no-transfer-progress
-        working-directory: ./green-global-initiative-api
+      # # Step 4: Build and test with Maven (from your code directory)
+      # - name: Build and test with Maven
+      #   run: mvn clean package -Dspring.profiles.active=development -DskipTests --no-transfer-progress
+      #   working-directory: ./green-global-initiative-api
 
 
 
@@ -96,9 +96,9 @@ jobs:
           docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
       # Step 11: Trivy Docker Image Scan
-      # # - name: Trivy Image Scan
-      #   run: |
-      #     trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
+      - name: Trivy Image Scan
+        run: |
+         trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
       # Step 12: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
