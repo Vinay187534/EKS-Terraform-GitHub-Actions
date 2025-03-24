@@ -97,11 +97,20 @@ jobs:
       #     SONARQUBE_PROJECT_NAME: three-tier-backend
       #   working-directory: green-global-initiative/green-global-initiative-api
 
-      # # Step 8: OWASP Dependency-Check Scan
-      # - name: OWASP Dependency-Check Scan
-      #   run: |
-      #     dependency-check --scan ./green-global-initiative/green-global-initiative-api --out ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
-      #     dependency-check-publisher -f ./green-global-initiative/green-global-initiative-api/dependency-check-report.xml
+      # Step 8: OWASP Dependency-Check Scan
+      - name: OWASP Dependency-Check Scan
+        continue-on-error: true
+        run: |
+          dependency-check --scan /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api --out /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.xml
+          dependency-check-publisher -f /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.xml
+
+      - name: Run OWASP Dependency Check
+        continue-on-error: true
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'green-global-initiative'
+          format: 'ALL'
+          fail_on_cvss: 7
 
       # # Step 7: Install Snyk CLI
       # - name: Install Snyk CLI
