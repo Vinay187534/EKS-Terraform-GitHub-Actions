@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
@@ -92,8 +92,7 @@ jobs:
       # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
         run: |
-          mkdir -p trivy_results
-          trivy fs green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivy_results/trivyfs-backend.txt
+          trivy fs green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > green-global-initiative-api/trivy_results/trivyimage-backend.txt
 
       - name: Docker Build Backend Image
         run: |
