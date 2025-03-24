@@ -74,7 +74,7 @@ jobs:
           unzip dependency-check-6.5.0-release.zip
           sudo mv dependency-check /usr/local/bin/
           sudo chmod +x /usr/local/bin/dependency-check
-          dependency-check --version  # Verify installation
+          sudo dependency-check --version  # Verify installation
 
       - name: Run OWASP Dependency-Check for vulnerabilities
         run: |
