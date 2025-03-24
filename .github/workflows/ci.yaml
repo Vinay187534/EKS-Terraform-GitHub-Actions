@@ -59,14 +59,14 @@ jobs:
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: green-global-initiative-api
 
-      # - name: Run Snyk Security Scan
-      #   run: |
-      #     npm install -g snyk
-      #     snyk test --severity-threshold=critical
-      #   continue-on-error: true
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   working-directory: green-global-initiative-api
+      - name: Run Snyk Security Scan
+        run: |
+          npm install -g snyk
+          snyk test --severity-threshold=critical
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: green-global-initiative-api
 
       - name: Install OWASP Dependency-Check
         run: |
@@ -83,13 +83,14 @@ jobs:
       # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
       - name: Install OWASP ZAP
         run: |
-          sudo apt-get install -y zaproxy
+          wget https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_unix.tar.gz
+          tar -xvf ZAP_2.12.0_unix.tar.gz
+          sudo mv ZAP_2.12.0 /opt/zap
 
-      # Step 4: Run OWASP ZAP (Optional, you can replace this with an actual ZAP API scan)
       - name: Run OWASP ZAP Scan
-        working-directory: green-global-initiative-api
         run: |
-          zap.sh -cmd -quickurl XXXXXXXXXXXXXXXXXXXXX -quickout ./green-global-initiative-api/zap-report.html
+          /opt/zap/zap.sh -cmd -quickurl http://localhost:8080 -quickout green-global-initiative-api/zap-report.html
+        working-directory: green-global-initiative-api
 
       # - name: Install Trivy
       #   run: |
