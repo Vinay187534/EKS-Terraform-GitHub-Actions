@@ -109,13 +109,13 @@ jobs:
 
       # Upload Trivy File Scan and Image Scan as Artifacts
       - name: Upload Trivy File Scan Results as Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: trivyfs-backend-report
           path: trivyfs-backend.txt
 
       - name: Upload Trivy Image Scan Results as Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: trivyimage-backend-report
           path: trivyimage-backend.txt
