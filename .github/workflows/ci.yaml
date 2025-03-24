@@ -20,7 +20,6 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -93,6 +92,10 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
 
+      - name: Ensure Trivy Results Directory Exists
+        run: mkdir -p green-global-initiative-api/trivy_results
+        shell: bash
+
       # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
         run: |
@@ -120,10 +123,6 @@ jobs:
           git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git commit -m "Update backend image tag to ${IMAGE_TAG}"
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
-
-      - name: Ensure Trivy Results Directory Exists
-        run: mkdir -p green-global-initiative-api/trivy_results
-        shell: bash
 
       # Upload Trivy File Scan Results as Artifacts
       - name: Upload Trivy File Scan Results as Artifacts
