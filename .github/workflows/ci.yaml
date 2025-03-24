@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
@@ -129,7 +129,7 @@ jobs:
           name: trivyfs-backend-report
           path: green-global-initiative-api/trivy_results/trivyfs-backend.txt
 
-      # Upload Trivy Image Scan Results as Artifact
+      # Upload Trivy Image Scan Results as Artifacts
       - name: Upload Trivy Image Scan Results as Artifacts
         uses: actions/upload-artifact@v4
         with:
