@@ -82,14 +82,14 @@ jobs:
         run: npm install -g snyk
 
       - name: Snyk Security Scans
-        run: snyk test --org=shreyashettys202 --project-name='Project-Group3'
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions'
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
       - name: Snyk Monitor
-        run: snyk monitor --org=shreyashettys202 --project-name='Project-Group3'
+        run: snyk monitor --org=shreyashettys202 --project-name='EKS-Terraform-GitHub-Actions'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
