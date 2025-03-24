@@ -103,10 +103,10 @@ jobs:
 
       # Step 8: Run Dependency-Check Scan
       - name: Run Dependency-Check Scan
-        working-directory: ./green-global-initiative-api
+        working-directory: /home/ubuntu/actions-runner
         run: |
-          dependency-check --scan ./green-global-initiative-api --out ./green-global-initiative-api/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
-          dependency-check-publisher -f /home/ubuntu/actions-runner/dependency-check-report.html
+          dependency-check --scan /home/ubuntu/actions-runner --out /home/ubuntu/actions-runner/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
+          dependency-check-publisher -f ./green-global-initiative-api/dependency-check-report.html -t HTML -n "Dependency-Check Report"
         continue-on-error: true
 
       - name: Run OWASP Dependency Check
