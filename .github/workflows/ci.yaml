@@ -80,39 +80,39 @@ jobs:
         run: |
           /usr/local/bin/dependency-check/bin/dependency-check.sh --project "EKS-Terraform-GitHub-Actions" --scan green-global-initiative-api/src --format "HTML" --out green-global-initiative-api/dependency-check-report.html
 
-      # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
-      - name: Install OWASP ZAP
+      # # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
+      # - name: Install OWASP ZAP
+      #   run: |
+      #     wget https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_unix.tar.gz
+      #     tar -xvf ZAP_2.12.0_unix.tar.gz
+      #     sudo mv ZAP_2.12.0 /opt/zap
+
+      # - name: Run OWASP ZAP Scan
+      #   run: |
+      #     /opt/zap/zap.sh -cmd -quickurl http://localhost:8080 -quickout green-global-initiative-api/zap-report.html
+      #   working-directory: green-global-initiative-api
+
+      - name: Install Trivy
         run: |
-          wget https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_unix.tar.gz
-          tar -xvf ZAP_2.12.0_unix.tar.gz
-          sudo mv ZAP_2.12.0 /opt/zap
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
 
-      - name: Run OWASP ZAP Scan
+      # Step 9: Trivy file scan (for backend)
+      - name: Trivy File Scan
         run: |
-          /opt/zap/zap.sh -cmd -quickurl http://localhost:8080 -quickout green-global-initiative-api/zap-report.html
-        working-directory: green-global-initiative-api
+          mkdir -p trivy_results
+          trivy fs green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivy_results/trivyfs-backend.txt
 
-      # - name: Install Trivy
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y wget
-      #     wget https://github.com/aquasecurity/trivy/releases/download/v0.35.0/trivy_0.35.0_Linux-64bit.deb
-      #     sudo dpkg -i trivy_0.35.0_Linux-64bit.deb
+      - name: Docker Build Backend Image
+        run: |
+          docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
 
-      # # Step 9: Trivy file scan (for backend)
-      # - name: Trivy File Scan
-      #   run: |
-      #     mkdir -p trivy_results
-      #     trivy fs green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivy_results/trivyfs-backend.txt
-
-      # - name: Docker Build Backend Image
-      #   run: |
-      #     docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
-
-      # # Step 12: Trivy Docker Image Scan
-      # - name: Trivy Image Scan
-      #   run: |
-      #     trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL --security-checks vuln --timeout 10m > trivy_results/trivyimage-backend.txt
+      # Step 12: Trivy Docker Image Scan
+      - name: Trivy Image Scan
+        run: |
+          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL --security-checks vuln --debug --timeout 10m > trivy_results/trivyimage-backend.txt
 
       # - name: Push Docker Image to Docker Hub
       #   run: |
@@ -131,7 +131,7 @@ jobs:
 
       # - name: Ensure Trivy Results Directory Exists
       #   run: mkdir -p trivy_results
-      #   working-directory: ./green-global-initiative-api
+      #   working-directory: green-global-initiative-api
       #   shell: bash
 
       # # Upload Trivy File Scan Results as Artifacts
@@ -139,20 +139,20 @@ jobs:
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: trivyfs-backend-report
-      #     path: ./green-global-initiative-api/trivy_results/trivyfs-backend.txt
+      #     path: green-global-initiative-api/trivy_results/trivyfs-backend.txt
 
       # # Upload Trivy Image Scan Results as Artifacts
       # - name: Upload Trivy Image Scan Results as Artifacts
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: trivyimage-backend-report
-      #     path: ./green-global-initiative-api/trivy_results/trivyimage-backend.txt
+      #     path: green-global-initiative-api/trivy_results/trivyimage-backend.txt
 
       # - name: Upload Dependency Check Report as Artifact
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: dependency-check-report
-      #     path: ./green-global-initiative-api/dependency-check-report.html
+      #     path: green-global-initiative-api/dependency-check-report.html
 
   # deploy:
   #   needs: build
@@ -172,7 +172,7 @@ jobs:
   #       run: aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
 
   #     - name: Deploy Kubernetes Manifests to EKS
-  #       working-directory: ./Kubernetes-Manifest-Files
+  #       working-directory: Kubernetes-Manifest-Files
   #       run: |
   #         kubectl create namespace three-tier || echo "Namespace already exists"
   #         kubectl apply -f ./Database/
