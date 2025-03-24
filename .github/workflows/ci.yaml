@@ -59,14 +59,14 @@ jobs:
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: ./green-global-initiative-api
 
-      # - name: Run Snyk Security Scan
-      #   run: |
-      #     npm install -g snyk
-      #     snyk test --severity-threshold=critical
-      #   continue-on-error: true
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   working-directory: ./green-global-initiative-api
+      - name: Run Snyk Security Scan
+        run: |
+          npm install -g snyk
+          snyk test --severity-threshold=critical
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
 
       - name: Install OWASP Dependency-Check
         run: |
@@ -78,7 +78,7 @@ jobs:
 
       - name: Run OWASP Dependency-Check for vulnerabilities
         run: |
-          dependency-check --project "Backend" --scan ./green-global-initiative-api --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
+          /usr/local/bin/dependency-check/bin/dependency-check.sh --project "Backend" --scan ./green-global-initiative-api --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
         working-directory: ./green-global-initiative-api
       # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
       - name: Install OWASP ZAP
