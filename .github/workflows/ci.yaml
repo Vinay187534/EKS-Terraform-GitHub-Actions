@@ -18,6 +18,7 @@ jobs:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      JAVA_HOME: "/home/ubuntu/actions-runner/deploy-backend/_tool/Java_Temurin-Hotspot_jdk/21.0.6-7.0.LTS/x64" # Set JAVA_HOME
 
     steps:
       # Step to check if folder exists and remove it
@@ -105,7 +106,7 @@ jobs:
       - name: Run Dependency-Check Scan
         working-directory: /home/ubuntu/actions-runner
         run: |
-          dependency-check --scan /home/ubuntu/actions-runner --out /home/ubuntu/actions-runner/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
+          dependency-check --scan ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api --out /home/ubuntu/actions-runner/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
           dependency-check-publisher -f ./green-global-initiative-api/dependency-check-report.html -t HTML -n "Dependency-Check Report"
         continue-on-error: true
 
