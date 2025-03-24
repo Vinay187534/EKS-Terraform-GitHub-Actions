@@ -78,7 +78,7 @@ jobs:
 
       - name: Run OWASP Dependency-Check for vulnerabilities
         run: |
-          /usr/local/bin/dependency-check/bin/dependency-check.sh --project "Backend" --scan ./green-global-initiative-api/src --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
+          /usr/local/bin/dependency-check/bin/dependency-check.sh --project "EKS-Terraform-GitHub-Actions" --scan ./green-global-initiative-api/src --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
         working-directory: ./green-global-initiative-api
       # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
       - name: Install OWASP ZAP
