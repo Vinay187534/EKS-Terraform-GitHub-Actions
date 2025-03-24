@@ -47,17 +47,17 @@ jobs:
 
       - name: Generate Maven Wrapper
         run: mvn -N wrapper:wrapper
-        working-directory: ./green-global-initiative-api
+        working-directory: green-global-initiative-api
 
       - name: Ensure mvnw is executable
-        run: chmod +x ./green-global-initiative-api/mvnw
+        run: chmod +x green-global-initiative-api/mvnw
 
       - name: List files in the directory
-        run: ls -la ./green-global-initiative-api
+        run: ls -la green-global-initiative-api
 
       - name: Build and test with Maven
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
-        working-directory: ./green-global-initiative-api
+        working-directory: green-global-initiative-api
 
       # - name: Run Snyk Security Scan
       #   run: |
@@ -66,7 +66,7 @@ jobs:
       #   continue-on-error: true
       #   env:
       #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      #   working-directory: ./green-global-initiative-api
+      #   working-directory: green-global-initiative-api
 
       - name: Install OWASP Dependency-Check
         run: |
@@ -78,8 +78,8 @@ jobs:
 
       - name: Run OWASP Dependency-Check for vulnerabilities
         run: |
-          /usr/local/bin/dependency-check/bin/dependency-check.sh --project "EKS-Terraform-GitHub-Actions" --scan ./green-global-initiative-api/src --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
-        working-directory: ./green-global-initiative-api
+          /usr/local/bin/dependency-check/bin/dependency-check.sh --project "EKS-Terraform-GitHub-Actions" --scan green-global-initiative-api/src --format "HTML" --out green-global-initiative-api/dependency-check-report.html
+
       # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
       - name: Install OWASP ZAP
         run: |
@@ -87,7 +87,7 @@ jobs:
 
       # Step 4: Run OWASP ZAP (Optional, you can replace this with an actual ZAP API scan)
       - name: Run OWASP ZAP Scan
-        working-directory: ./green-global-initiative-api
+        working-directory: green-global-initiative-api
         run: |
           zap.sh -cmd -quickurl XXXXXXXXXXXXXXXXXXXXX -quickout ./green-global-initiative-api/zap-report.html
 
@@ -102,7 +102,7 @@ jobs:
       # - name: Trivy File Scan
       #   run: |
       #     mkdir -p trivy_results
-      #     trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivy_results/trivyfs-backend.txt
+      #     trivy fs green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivy_results/trivyfs-backend.txt
 
       # - name: Docker Build Backend Image
       #   run: |
