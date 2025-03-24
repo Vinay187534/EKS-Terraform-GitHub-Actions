@@ -20,16 +20,6 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       - name: Set up Java JDK & Maven
         uses: actions/setup-java@v3
         with:
@@ -109,10 +99,9 @@ jobs:
         run: |
           docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
 
-      # Step 12: Trivy Docker Image Scan
       - name: Trivy Image Scan
         run: |
-          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL --security-checks vuln --debug --timeout 10m > trivy_results/trivyimage-backend.txt
+          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL --security-checks vuln --timeout 10m > green-global-initiative-api/trivy_results/trivyimage-backend.txt
 
       - name: Push Docker Image to Docker Hub
         run: |
@@ -130,8 +119,7 @@ jobs:
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
       - name: Ensure Trivy Results Directory Exists
-        run: mkdir -p trivy_results
-        working-directory: green-global-initiative-api
+        run: mkdir -p green-global-initiative-api/trivy_results
         shell: bash
 
       # Upload Trivy File Scan Results as Artifacts
