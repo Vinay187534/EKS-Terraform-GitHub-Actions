@@ -37,6 +37,28 @@ jobs:
           java-version: "21"
           cache: maven
 
+      # Step 5: Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/green-global-initiative-api/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Generate Maven Wrapper
+        run: sudo mvn -N io.takari:maven:wrapper
+        working-directory: ./green-global-initiative-api
+
+      # Step 6: Ensure mvnw is executable (fix the permission issue)
+      - name: Ensure mvnw is executable
+        # working-directory: ./green-global-initiative-api
+        run: sudo chmod +x ./green-global-initiative-api/mvnw
+
+      # Step 7: List files in the directory
+      - name: List files in the directory
+        run: ls -la ./green-global-initiative-api
+
       - name: Build and test with Maven
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: ./green-global-initiative-api
