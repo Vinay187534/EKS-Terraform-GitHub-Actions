@@ -104,8 +104,8 @@ jobs:
       # Step 8: Run Dependency-Check Scan
       - name: Run Dependency-Check Scan
         run: |
-          dependency-check --scan ./green-global-initiative-api --out /home/ubuntu/actions-runner.dependency-check-report --format HTML
-          dependency-check-publisher -f /home/ubuntu/actions-runner.dependency-check-report -t HTML -n "Dependency-Check Report"
+          dependency-check --scan /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api --out /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.html
+          dependency-check-publisher -f /home/ubuntu/actions-runner/dependency-check-report.html
         continue-on-error: true
 
       - name: Run OWASP Dependency Check
