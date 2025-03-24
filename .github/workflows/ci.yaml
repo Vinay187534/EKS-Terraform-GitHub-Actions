@@ -20,7 +20,6 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
-
       # Step to check if folder exists and remove it
       - name: Remove folder if it exists
         run: |
@@ -97,19 +96,19 @@ jobs:
       #     SONARQUBE_PROJECT_NAME: three-tier-backend
       #   working-directory: green-global-initiative/green-global-initiative-api
 
-      # Step 8: OWASP Dependency-Check Scan
-      - name: OWASP Dependency-Check Scan
-        continue-on-error: true
+      # Step 8: Run Dependency-Check Scan
+      - name: Run Dependency-Check Scan
         run: |
-          dependency-check --scan /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api --out /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.xml
-          dependency-check-publisher -f /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.xml
+          dependency-check --scan ./green-global-initiative-api --out ./green-global-initiative-api/dependency-check-report.html
+          dependency-check-publisher -f ./green-global-initiative-api/dependency-check-report.html
+        continue-on-error: true
 
       - name: Run OWASP Dependency Check
         continue-on-error: true
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'green-global-initiative'
-          format: 'ALL'
+          project: "EKS-Terraform-GitHub-Actions"
+          format: "ALL"
           fail_on_cvss: 7
 
       # # Step 7: Install Snyk CLI
@@ -137,7 +136,7 @@ jobs:
       #       echo "Snyk authentication failed"
       #       exit 1
       #     fi
-      
+
       # Snyk Integration
       - name: Run Snyk to check for vulnerabilities
         working-directory: /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api
@@ -176,9 +175,6 @@ jobs:
       #   with:
       #     sarif_file: snyk.sarif
       #     category: "Snyk OpenSource Unique Category"
-
-
- 
 
       # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
