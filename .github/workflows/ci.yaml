@@ -114,7 +114,6 @@ jobs:
       # Upload Trivy File Scan Results as Artifacts
       - name: Upload Trivy File Scan Results as Artifacts
         uses: actions/upload-artifact@v3
-        working-directory: ./green-global-initiative-api
         with:
           name: trivyfs-backend-report
           path: trivy_results/trivyfs-backend.txt
@@ -122,7 +121,6 @@ jobs:
       # Upload Trivy Image Scan Results as Artifacts
       - name: Upload Trivy Image Scan Results as Artifacts
         uses: actions/upload-artifact@v3
-        working-directory: ./green-global-initiative-api
         with:
           name: trivyimage-backend-report
           path: trivy_results/trivyimage-backend.txt
