@@ -103,8 +103,9 @@ jobs:
 
       # Step 8: Run Dependency-Check Scan
       - name: Run Dependency-Check Scan
+        working-directory: ./green-global-initiative-api
         run: |
-          dependency-check --scan /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api --out /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/dependency-check-report.html
+          dependency-check --scan ./green-global-initiative-api --out ./green-global-initiative-api/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
           dependency-check-publisher -f /home/ubuntu/actions-runner/dependency-check-report.html
         continue-on-error: true
 
@@ -115,32 +116,6 @@ jobs:
           project: "EKS-Terraform-GitHub-Actions"
           format: "ALL"
           fail_on_cvss: 7
-
-      # # Step 7: Install Snyk CLI
-      # - name: Install Snyk CLI
-      #   run: sudo npm install -g snyk
-
-      # # Step 7: Check if Snyk CLI is installed
-      # - name: Check Snyk CLI installation
-      #   run: |
-      #     if ! sudo command -v snyk &> /dev/null; then
-      #       echo "Snyk CLI is not installed. Installing now..."
-      #       sudo npm install -g snyk
-      #     else
-      #       echo "Snyk CLI is already installed."
-      #       sudo snyk --version
-      #     fi
-
-      # - name: Authenticate Snyk CLI
-      #   run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
-      # - name: Verify Snyk Authentication
-      #   run: |
-      #     sudo snyk auth ${{ secrets.SNYK_TOKEN }}
-      #     if [ $? -ne 0 ]; then
-      #       echo "Snyk authentication failed"
-      #       exit 1
-      #     fi
 
       # Snyk Integration
       - name: Run Snyk to check for vulnerabilities
