@@ -96,6 +96,11 @@ jobs:
       #     SONARQUBE_PROJECT_NAME: three-tier-backend
       #   working-directory: green-global-initiative/green-global-initiative-api
 
+      # Step 2: Install Dependency-Check via npm
+      - name: Install Dependency-Check
+        run: |
+          sudo npm install -g dependency-check
+
       # Step 8: Run Dependency-Check Scan
       - name: Run Dependency-Check Scan
         run: |
