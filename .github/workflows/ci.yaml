@@ -20,6 +20,10 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Set up Java JDK & Maven
         uses: actions/setup-java@v3
         with:
