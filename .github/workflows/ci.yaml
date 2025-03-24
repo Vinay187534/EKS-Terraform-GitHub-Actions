@@ -89,7 +89,7 @@ jobs:
       # Step 12: Trivy Docker Image Scan
       - name: Trivy Image Scan
         run: |
-          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivy_results/trivyimage-backend.txt
+          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL --security-checks vuln > trivy_results/trivyimage-backend.txt
 
       # - name: Push Docker Image to Docker Hub
       #   run: |
