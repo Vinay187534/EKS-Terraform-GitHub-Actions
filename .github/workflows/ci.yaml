@@ -146,9 +146,12 @@ jobs:
           name: trivyimage-backend-report
           path: ./green-global-initiative-api/trivy_results/trivyimage-backend.txt
 
-      # Upload Dependency Check Report
       - name: Upload Dependency Check Report as Artifact
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: ./green-global-initiative-api/dependency-check-report.html
+
 
 
   # deploy:
