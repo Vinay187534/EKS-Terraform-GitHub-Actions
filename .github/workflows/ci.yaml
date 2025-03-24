@@ -68,18 +68,18 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
-      # Step 1: Install OWASP Dependency-Check
       - name: Install OWASP Dependency-Check
         run: |
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v6.5.0/dependency-check-6.5.0-release.zip
           unzip dependency-check-6.5.0-release.zip
           sudo mv dependency-check /usr/local/bin/
+          sudo chmod +x /usr/local/bin/dependency-check
+          dependency-check --version  # Verify installation
 
-      # Step 2: Run OWASP Dependency-Check for vulnerabilities
-      - name: Run OWASP Dependency-Check
+      - name: Run OWASP Dependency-Check for vulnerabilities
         run: |
           dependency-check --project "Backend" --scan ./green-global-initiative-api --format "HTML" --out ./green-global-initiative-api/dependency-check-report.html
-
+        working-directory: ./green-global-initiative-api
       # Step 3: Install OWASP ZAP (Dynamic Application Security Testing)
       - name: Install OWASP ZAP
         run: |
@@ -87,8 +87,9 @@ jobs:
 
       # Step 4: Run OWASP ZAP (Optional, you can replace this with an actual ZAP API scan)
       - name: Run OWASP ZAP Scan
+        working-directory: ./green-global-initiative-api
         run: |
-          zap.sh -cmd -quickurl http://localhost:8080 -quickout ./green-global-initiative-api/zap-report.html
+          zap.sh -cmd -quickurl XXXXXXXXXXXXXXXXXXXXX -quickout ./green-global-initiative-api/zap-report.html
 
       - name: Install Trivy
         run: |
