@@ -72,9 +72,19 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         working-directory: ./green-global-initiative-api
 
+      # Step 9: Trivy file scan (for backend)
+      - name: Trivy File Scan
+        run: |
+          trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
+
       - name: Docker Build Backend Image
         run: |
           docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
+
+      # Step 12: Trivy Docker Image Scan
+      - name: Trivy Image Scan
+        run: |
+          trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
       - name: Push Docker Image to Docker Hub
         run: |
