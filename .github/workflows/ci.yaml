@@ -91,20 +91,20 @@ jobs:
         run: |
           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivy_results/trivyimage-backend.txt
 
-      - name: Push Docker Image to Docker Hub
-        run: |
-          echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-          docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
+      # - name: Push Docker Image to Docker Hub
+      #   run: |
+      #     echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+      #     docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
-      - name: Update Deployment Image in YAML
-        run: |
-          IMAGE_TAG=${GITHUB_SHA}
-          sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/backend:${IMAGE_TAG}|" ./Kubernetes-Manifest-Files/Backend/deployment.yaml
-          git config --global user.email "L00187534@atu.ie"
-          git config --global user.name "vinay187534"
-          git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
-          git commit -m "Update backend image tag to ${IMAGE_TAG}"
-          git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+      # - name: Update Deployment Image in YAML
+      #   run: |
+      #     IMAGE_TAG=${GITHUB_SHA}
+      #     sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/backend:${IMAGE_TAG}|" ./Kubernetes-Manifest-Files/Backend/deployment.yaml
+      #     git config --global user.email "L00187534@atu.ie"
+      #     git config --global user.name "vinay187534"
+      #     git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
+      #     git commit -m "Update backend image tag to ${IMAGE_TAG}"
+      #     git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
       - name: Ensure Trivy Results Directory Exists
         run: mkdir -p trivy_results
@@ -113,17 +113,17 @@ jobs:
 
       # Upload Trivy File Scan Results as Artifacts
       - name: Upload Trivy File Scan Results as Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: trivyfs-backend-report
-          path: trivy_results/trivyfs-backend.txt
+          path: ./green-global-initiative-api/trivy_results/trivyfs-backend.txt
 
       # Upload Trivy Image Scan Results as Artifacts
       - name: Upload Trivy Image Scan Results as Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: trivyimage-backend-report
-          path: trivy_results/trivyimage-backend.txt
+          path: ./green-global-initiative-api/trivy_results/trivyimage-backend.txt
 
 
   # deploy:
