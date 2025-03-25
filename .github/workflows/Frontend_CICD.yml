@@ -10,20 +10,24 @@ on:
         type: choice
         options:
           - frontend
+
+env:
+  COVERAGE_THRESHOLD: 75 # Set your desired coverage threshold here
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
-    env:
-      COVERAGE_THRESHOLD: 75 # Set your desired coverage threshold here
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-      DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    outputs:
+      IMAGE_TAG: ${{ steps.set_image_tag.outputs.IMAGE_TAG }}
 
     steps:
       - name: Checkout repository
@@ -216,7 +220,6 @@ jobs:
         run: aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
 
       # Check if the image is updated or if it's the first deployment
-      # Step 4: Check if the frontend deployment already exists
       - name: Check if deployment exists
         id: check-deployment
         run: |
@@ -227,7 +230,7 @@ jobs:
             echo "deployment-exists=false" >> $GITHUB_ENV
           fi
 
-      # Step 5: Check if the image has changed (only if deployment exists)
+      # Check if the image has changed (only if deployment exists)
       - name: Check if the image has been updated
         id: check-image
         if: env.deployment-exists == 'true'
@@ -243,7 +246,7 @@ jobs:
             echo "image-updated=false" >> $GITHUB_ENV
           fi
 
-      # Step 6: Deploy Kubernetes manifests (only if first deployment)
+      # Deploy Kubernetes manifests (only if first deployment)
       - name: Deploy Kubernetes Manifests to EKS
         if: env.deployment-exists == 'false'
         run: |
@@ -252,7 +255,7 @@ jobs:
           kubectl apply -f ./Kubernetes-Manifest-Files/frontend/
           kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
 
-      # Step 7: Update the deployment with a new image (only if image is updated)
+      # Update the deployment with a new image (only if image is updated)
       - name: Rollout Deployment (only if image has changed)
         if: env.deployment-exists == 'true' && env.image-updated == 'true'
         run: |
