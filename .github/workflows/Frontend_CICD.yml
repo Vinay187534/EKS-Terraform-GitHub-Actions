@@ -115,7 +115,7 @@ jobs:
         run: trivy fs . --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-frontend.txt
 
       - name: Set IMAGE_TAG
-        run: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        run: echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV && echo "IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
       # step 10: Image Build, scan, and Push to Docker Hub
       - name: Set up Docker Buildx
@@ -209,6 +209,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          IMAGE_TAG: ${{ needs.build.outputs.IMAGE_TAG }}
 
       - name: Set up kubectl for EKS
         run: aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
@@ -233,9 +235,9 @@ jobs:
           # Get the currently deployed image
           LAST_DEPLOYED_IMAGE=$(kubectl get deployment frontend -n three-tier -o=jsonpath='{.spec.template.spec.containers[0].image}')
           echo "Last deployed image: $LAST_DEPLOYED_IMAGE"
-          echo "Current image: ${DOCKER_HUB_USERNAME}/frontend:${{ ENV.IMAGE_TAG }}"
+          echo "Current image: ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG}"
           # Compare images and set flag
-          if [ "$LAST_DEPLOYED_IMAGE" != "${DOCKER_HUB_USERNAME}/frontend:${{ ENV.IMAGE_TAG }}" ]; then
+          if [ "$LAST_DEPLOYED_IMAGE" != "${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG}" ]; then
             echo "image-updated=true" >> $GITHUB_ENV
           else
             echo "image-updated=false" >> $GITHUB_ENV
@@ -255,6 +257,6 @@ jobs:
         if: env.deployment-exists == 'true' && env.image-updated == 'true'
         run: |
           echo "Updating image for existing deployment..."
-          kubectl set image deployment/frontend frontend=${DOCKER_HUB_USERNAME}/frontend:${{ ENV.IMAGE_TAG }} --namespace=three-tier
+          kubectl set image deployment/frontend frontend=${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG} --namespace=three-tier
           # Wait for the update to complete
           kubectl rollout status deployment/frontend --namespace=three-tier
