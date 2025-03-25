@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: [self-hosted]
+    permissions:
+      contents: write
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -15,8 +17,21 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      JAVA_HOME: "/home/ubuntu/actions-runner/deploy-backend/_tool/Java_Temurin-Hotspot_jdk/21.0.6-7.0.LTS/x64" # Set JAVA_HOME
 
     steps:
+      # Step to check if folder exists and remove it
+      - name: Remove folder if it exists
+        run: |
+          if [ -d "/home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/.mvn" ]; then
+            sudo rm -rf /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/.mvn
+            echo "Folder deleted."
+          else
+            echo "Folder does not exist. Skipping deletion."
+          fi
+        shell: bash
+
       # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -29,13 +44,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Set up Java JDK and Maven
+      # Step 3: Set up Java JDK  Maven
       - name: Set up Java JDK
         uses: actions/setup-java@v2
         with:
           java-version: "21" # Adjust as necessary
           distribution: "temurin"
 
+      # Step 4: Set up Maven
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
@@ -43,7 +59,7 @@ jobs:
           maven-version: "3.8.7" # Adjust as necessary
           distribution: "temurin" # Same distribution as for Java
 
-      # Step 4: Cache Maven dependencies
+      # Step 5: Cache Maven dependencies
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
@@ -52,50 +68,127 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 5: Build and test with Maven (from your code directory)
+      - name: Generate Maven Wrapper
+        run: sudo mvn -N io.takari:maven:wrapper
+        working-directory: ./green-global-initiative-api
+
+      # Step 6: Ensure mvnw is executable (fix the permission issue)
+      - name: Ensure mvnw is executable
+        # working-directory: ./green-global-initiative-api
+        run: sudo chmod +x ./green-global-initiative-api/mvnw
+
+      # Step 7: List files in the directory
+      - name: List files in the directory
+        run: ls -la ./green-global-initiative-api
+
+      # Step 6: Build and test with Maven (from your code directory)
       - name: Build and test with Maven
         run: mvn clean install -DskipTests -Dmaven.javadoc.skip=true
         working-directory: ./green-global-initiative-api
 
-      # Step 6: Trivy file scan (for backend)
+      # Step 7: SonarQube scan (optional step for code quality)
+      # - name: SonarQube Scan
+      #   uses: sonarsource/sonarcloud-github-action@v1
+      #   with:
+      #     sonar-token: ${{ secrets.SONARQUBE_TOKEN }}
+      #   env:
+      #     SONARQUBE_HOST_URL: https://sonarcloud.io
+      #     SONARQUBE_PROJECT_KEY: three-tier-backend
+      #     SONARQUBE_PROJECT_NAME: three-tier-backend
+      #   working-directory: green-global-initiative/green-global-initiative-api
+
+      # Step 2: Install Dependency-Check via npm
+      - name: Install Dependency-Check
+        run: |
+          sudo npm install -g dependency-check
+
+      # Step 8: Run Dependency-Check Scan
+      - name: Run Dependency-Check Scan
+        working-directory: /home/ubuntu/actions-runner
+        run: |
+          dependency-check --scan ./green-global-initiative-api/src/main/java/com/atu/green_global_initiative_api --out /home/ubuntu/actions-runner/dependency-check-report.html --format HTML --project EKS-Terraform-GitHub-Actions
+          dependency-check-publisher -f ./green-global-initiative-api/dependency-check-report.html -t HTML -n "Dependency-Check Report"
+        continue-on-error: true
+
+      - name: Run OWASP Dependency Check
+        continue-on-error: true
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "EKS-Terraform-GitHub-Actions"
+          format: "ALL"
+          fail_on_cvss: 7
+
+      # Snyk Integration
+      - name: Run Snyk to check for vulnerabilities
+        working-directory: /home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api
+        continue-on-error: true
+        run: |
+          sudo npm install -g snyk
+          sudo snyk test --severity-threshold=critical
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Step 8: Snyk Security Scans for Java
+      - name: Snyk Security Scan
+        run: snyk test --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=/home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/pom.xml
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
+
+      - name: Snyk Monitor
+        run: snyk monitor --org=vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=/home/ubuntu/actions-runner/deploy-backend/EKS-Terraform-GitHub-Actions/EKS-Terraform-GitHub-Actions/green-global-initiative-api/pom.xml
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./green-global-initiative-api
+
+      # # Step 9: Snyk security scan step for Code Scanning
+      # - name: Run Snyk to check for vulnerabilities
+      #   run: snyk test --org=Vinay187534 --project-name='EKS-Terraform-GitHub-Actions' --file=./pom.xml --sarif-file-output=snyk.sarif
+      #   continue-on-error: true
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   working-directory: ./green-global-initiative-api
+
+      # - name: Upload SARIF to GitHub Security Center
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: snyk.sarif
+      #     category: "Snyk OpenSource Unique Category"
+
+      # Step 9: Trivy file scan (for backend)
       - name: Trivy File Scan
         run: |
           trivy fs ./green-global-initiative-api --severity HIGH,CRITICAL --ignore-unfixed > trivyfs-backend.txt
 
-      # Step 7: Upload Trivy File Scan Results as artifact
-      - name: Upload Trivy File Scan Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: trivyfs-backend
-          path: trivyfs-backend.txt
-
-      # Step 8: Docker Image Build for Backend
+      # Step 10: Docker Image Build for Backend
       - name: Docker Build Backend Image
         run: |
           docker system prune -f
           docker container prune -f
           docker build -t ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ./green-global-initiative-api
 
-      # Step 9: Push Docker Image to Docker Hub
+      # Step 11: Push Docker Image to Docker Hub
       - name: Push Docker Image to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
           docker tag ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
           docker push ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA}
 
-      # Step 10: Trivy Docker Image Scan
+      # Step 12: Trivy Docker Image Scan
       - name: Trivy Image Scan
         run: |
           trivy image ${DOCKER_HUB_USERNAME}/backend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-backend.txt
 
-      # Step 11: Upload Trivy Image Scan Results as artifact
-      - name: Upload Trivy Image Scan Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: trivyimage-backend
-          path: trivyimage-backend.txt
+      # Step: 13: Verify Repository Access
+      - name: Verify Repository Access
+        run: |
+          git config --global user.email "L00187534@atu.ie"
+          git config --global user.name "vinay187534"
+          git ls-remote https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }}
 
-      # Step 12: Update Deployment Image in YAML
+      # Step 14: Update Deployment Image in YAML
       - name: Update Deployment Image in YAML
         run: |
           IMAGE_TAG=${GITHUB_SHA}
@@ -105,6 +198,12 @@ jobs:
           git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git commit -m "Update backend image tag to ${IMAGE_TAG}"
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+
+      # Step 15: Rollout deployment with the new image
+      # - name: Rollout deployment with new image
+      #   run: |
+      #     kubectl rollout restart deployment backend -n three-tier  # Replace <namespace> with your actual namespace
+      #     kubectl rollout status deployment backend -n three-tier
 
   # Job 2: Deploy to Kubernetes (EKS)
   # deploy:
