@@ -209,35 +209,41 @@ jobs:
       - name: Set up kubectl for EKS
         run: aws eks update-kubeconfig --name dev-eks-cluster --region ${{ secrets.AWS_REGION }}
 
-      # Check if the image is being updated or if it's the first time deployment
+      # Check if the image is updated or if it's the first deployment
       - name: Check if the image has been updated
         id: check-image
         run: |
-          # Compare image tags or any other mechanism to track updates
+          # Check if deployment exists
           if kubectl get deployment frontend -n three-tier > /dev/null 2>&1; then
-          LAST_DEPLOYED_IMAGE=$(kubectl get deployment frontend -n three-tier -o=jsonpath='{.spec.template.spec.containers[0].image}')
-          echo "Last deployed image: $LAST_DEPLOYED_IMAGE"
+            LAST_DEPLOYED_IMAGE=$(kubectl get deployment frontend -n three-tier -o=jsonpath='{.spec.template.spec.containers[0].image}')
+            echo "Last deployed image: $LAST_DEPLOYED_IMAGE"
           else
-           echo "No existing deployment found. Proceeding with deployment."
-           LAST_DEPLOYED_IMAGE=""
+            echo "No existing deployment found. Proceeding with deployment."
+            LAST_DEPLOYED_IMAGE=""
           fi
+
           echo "Current image: ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA}"
+
+          # Determine if an update is needed
           if [ "$LAST_DEPLOYED_IMAGE" != "${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA}" ]; then
             echo "image-updated=true" >> $GITHUB_ENV
           else
             echo "image-updated=false" >> $GITHUB_ENV
           fi
 
-      # Step to deploy Kubernetes manifests to EKS only if it's the first time or the image has been updated
+      # Deploy Kubernetes manifests only if it's the first deployment
       - name: Deploy Kubernetes Manifests to EKS
-        if: ${{ env.image-updated == 'false' }}
+        if: env.image-updated == 'false'
         run: |
+          echo "Deploying Kubernetes manifests for the first time..."
           kubectl apply -f ./Kubernetes-Manifest-Files/frontend/
           kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
+          kubectl rollout status deployment/frontend -n three-tier
 
-      # Rollout Deployment only if the image is updated (skip the manifest deployment if image has been updated)
+      # Rollout Deployment only if the image has changed
       - name: Rollout Deployment (only if image has changed)
-        if: ${{ env.image-updated == 'true' }}
+        if: env.image-updated == 'true'
         run: |
+          echo "Updating image for existing deployment..."
           kubectl set image deployment/frontend frontend=${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA} --namespace=three-tier
           kubectl rollout status deployment/frontend --namespace=three-tier
