@@ -120,13 +120,13 @@ jobs:
       - name: Build Docker image
         working-directory: ./green-global-initiative-ui
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }} .
+          docker build -t ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA} .
 
       - name: Trivy Image Scan
-        run: trivy image ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }} --severity HIGH,CRITICAL > trivyimage-frontend.txt
+        run: trivy image ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-frontend.txt
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }}
+        run: docker push ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA}
 
       # OWASP Dependency Check with report generation
       - name: Run OWASP Dependency Check
@@ -241,7 +241,7 @@ jobs:
       - name: Deploy Kubernetes Manifests to EKS
         if: env.deployment-exists == 'false'
         run: |
-          echo "🚀 First-time deployment: Applying Kubernetes manifests..."
+          echo "First-time deployment: Applying Kubernetes manifests..."
           kubectl apply -f ./Kubernetes-Manifest-Files/Database/
           kubectl apply -f ./Kubernetes-Manifest-Files/frontend/
           kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
