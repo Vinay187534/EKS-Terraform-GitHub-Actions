@@ -191,7 +191,7 @@ jobs:
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME}
 
   deploy-on-EKS:
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
