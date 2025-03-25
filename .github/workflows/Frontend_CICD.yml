@@ -1,15 +1,12 @@
 name: Frontend CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       target:
         description: "Which to deploy"
         required: true
-        default: "both"
+        default: "frontend"
         type: choice
         options:
           - frontend
@@ -229,6 +226,7 @@ jobs:
             echo "image-updated=true" >> $GITHUB_ENV
           else
             echo "image-updated=false" >> $GITHUB_ENV
+          fi
 
       # Step to deploy Kubernetes manifests to EKS only if it's the first time or the image has been updated
       - name: Deploy Kubernetes Manifests to EKS
