@@ -1,4 +1,4 @@
-name: Frontend CI/CD Pipelines
+name: Frontend CI/CD Pipeline
 
 on:
   push:
@@ -191,6 +191,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Get Public IP of GitHub Runner
+        run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
+
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -206,6 +209,7 @@ jobs:
         id: check-image
         run: |
           # Compare image tags or any other mechanism to track updates
+          kubectl create namespace three-tier || echo "Namespace already exists"
           LAST_DEPLOYED_IMAGE=$(kubectl get deployment frontend -n three-tier -o=jsonpath='{.spec.template.spec.containers[0].image}')
           echo "Last deployed image: $LAST_DEPLOYED_IMAGE"
           echo "Current image: ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA}"
@@ -218,7 +222,6 @@ jobs:
       - name: Deploy Kubernetes Manifests to EKS
         if: ${{ env.image-updated == 'false' }}
         run: |
-          kubectl create namespace three-tier || echo "Namespace already exists"
           kubectl apply -f ./Kubernetes-Manifest-Files/frontend/
           kubectl apply -f ./Kubernetes-Manifest-Files/Frontend-ingress/frontend-ingress.yaml
 
