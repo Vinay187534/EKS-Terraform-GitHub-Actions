@@ -24,6 +24,7 @@ jobs:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      IMAGE_TAG: "$(date +'%Y%m%d-%H%M%S')"
 
     steps:
       - name: Checkout repository
@@ -119,15 +120,15 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Docker Build Backend Image
         run: |
-          docker build -t ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA} ./green-global-initiative-ui
+          docker build -t ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG} ./green-global-initiative-ui
 
       - name: Trivy Image Scan
-        run: trivy image ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA} --severity HIGH,CRITICAL > trivyimage-frontend.txt
+        run: trivy image ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG} --severity HIGH,CRITICAL > trivyimage-frontend.txt
 
       - name: Push Docker Image to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-          docker push ${DOCKER_HUB_USERNAME}/frontend:${GITHUB_SHA}
+          docker push ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG}
 
       # OWASP Dependency Check with report generation
       - name: Run OWASP Dependency Check
@@ -181,7 +182,6 @@ jobs:
 
       - name: Update Deployment Image in YAML
         run: |
-          IMAGE_TAG=$(date +'%Y%m%d-%H%M%S')
           sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG}|" ./Kubernetes-Manifest-Files/frontend/deployment.yaml
           git config --global user.email "L001875354@atu.ie"
           git config --global user.name "vinay187534"
@@ -191,7 +191,7 @@ jobs:
           git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME}
 
   deploy-on-EKS:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
