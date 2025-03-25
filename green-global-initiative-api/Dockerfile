@@ -12,7 +12,7 @@ COPY src ./src
 ARG PROFILE=development
 
 # Build the project (use --no-transfer-progress to speed up)
-RUN mvn clean package -Dspring.profiles.active=${PROFILE} -DskipTests -Dmaven.javadoc.skip=true --no-transfer-progress
+RUN mvn clean package -Dspring.profiles.active=${PROFILE} -DskipTests --no-transfer-progress
 
 # Stage 2: Runtime stage with a minimal JDK
 FROM eclipse-temurin:21-jre-alpine
