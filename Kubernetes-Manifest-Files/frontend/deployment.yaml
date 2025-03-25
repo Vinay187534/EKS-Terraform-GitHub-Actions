@@ -19,7 +19,7 @@ spec:
         - name: docker-registry-secret # This is the secret of the docker registry
       containers:
         - name: frontend
-          image: /frontend:6dc0519681d6a2c9371706ed4078c1c5913c5584
+          image: /frontend:ba32582f59bf74de0006ea223275b521fd01866d
           env:
             - name: ANGULAR_APP_BACKEND_URL
               value: "https://api.nausicaaglobalgreen.live/api/" # This is the backend URL
