@@ -98,7 +98,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Install Trivy
         run: |
@@ -116,13 +116,12 @@ jobs:
         working-directory: ./green-global-initiative-ui
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }} .
-          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }} ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
 
       - name: Trivy Image Scan
         run: trivy image ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }} --severity HIGH,CRITICAL > trivyimage-frontend.txt
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ github.sha }}
 
       # OWASP Dependency Check with report generation
       - name: Run OWASP Dependency Check
@@ -178,8 +177,8 @@ jobs:
         run: |
           IMAGE_TAG=${GITHUB_SHA}
           sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/frontend:${IMAGE_TAG}|" ./Kubernetes-Manifest-Files/frontend/deployment.yaml
-          git config --global user.email "L00187735@atu.ie"
-          git config --global user.name "athul7735@atu"
+          git config --global user.email "L001875354@atu.ie"
+          git config --global user.name "vinay187534"
           git checkout ${GITHUB_REF_NAME}
           git add ./Kubernetes-Manifest-Files/frontend/deployment.yaml
           git commit -m "Update frontend image tag to ${IMAGE_TAG}"
