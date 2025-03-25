@@ -1,9 +1,9 @@
 name: Deploy to EKS
 
-on:
-  push:
-    branches:
-      - main # Trigger deployment on push to main branch (modify as necessary)
+# on:
+#   push:
+#     branches:
+#       - main # Trigger deployment on push to main branch (modify as necessary)
 
 jobs:
   deploy:
