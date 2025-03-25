@@ -21,7 +21,7 @@ resource "aws_internet_gateway" "igw" {
   tags = {
     Name                                          = var.igw-name
     env                                           = var.env
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
+    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
   }
 
   depends_on = [aws_vpc.vpc]
@@ -38,7 +38,7 @@ resource "aws_subnet" "public-subnet" {
     Name                                          = "${var.pub-sub-name}-${count.index + 1}"
     Env                                           = var.env
     "kubernetes.io/role/elb"                      = "1"
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
+    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
   }
 
   depends_on = [aws_vpc.vpc,
@@ -56,7 +56,7 @@ resource "aws_subnet" "private-subnet" {
     Name                                          = "${var.pri-sub-name}-${count.index + 1}"
     Env                                           = var.env
     "kubernetes.io/role/internal-elb"             = "1"
-    "kubernetes.io/cluster/${local.cluster-name}" = "owned"
+    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
   }
 
   depends_on = [aws_vpc.vpc,
