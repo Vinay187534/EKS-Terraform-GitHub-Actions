@@ -198,16 +198,14 @@ jobs:
 
       - name: Update Deployment Image in YAML
         run: |
-          sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/frontend:${{ ENV.IMAGE_TAG }}|" ./Kubernetes-Manifest-Files/frontend/deployment.yaml
+          sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/frontend:${{ env.IMAGE_TAG }}|" ./Kubernetes-Manifest-Files/frontend/deployment.yaml
+          cat ./Kubernetes-Manifest-Files/frontend/deployment.yaml  # Debugging step
           git config --global user.email "L001875354@atu.ie"
           git config --global user.name "vinay187534"
-          git checkout ${GITHUB_REF_NAME}
-          git stash --include-untracked
           git pull origin ${GITHUB_REF_NAME} --rebase
-          git stash pop || echo "No changes to apply"
           git add ./Kubernetes-Manifest-Files/frontend/deployment.yaml
-          git commit -m "Update frontend image tag to ${{ ENV.IMAGE_TAG }}"
-          git push --force https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME}
+          git commit -m "Update frontend image tag to ${{ env.IMAGE_TAG }}" || echo "No changes to commit"
+          git push --force https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME} || echo "Git push failed"
 
   # deploy-on-EKS:
   #   needs: build
