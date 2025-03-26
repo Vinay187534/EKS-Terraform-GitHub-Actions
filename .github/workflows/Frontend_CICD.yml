@@ -116,6 +116,12 @@ jobs:
           output: "./reports"
           fail_on_cvss: 7
 
+      # Fix file permissions for reports directory
+      - name: Fix file permissions for reports directory
+        run: |
+          sudo chown -R $USER:$USER ./reports
+          sudo chmod -R 777 ./reports  # Gives full permissions (rwx) for all users
+
       - name: Install Trivy
         run: |
           sudo apt-get install -y wget apt-transport-https gnupg lsb-release
