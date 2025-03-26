@@ -159,13 +159,14 @@ jobs:
       # step 11: Update Deployment Image and push to GitHub
       - name: Update Deployment Image in YAML
         run: |
-          sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/frontend:${{ ENV.IMAGE_TAG }}|" ./Kubernetes-Manifest-Files/Backend/deployment.yaml
+          sed -i "s|image: .*$|image: ${DOCKER_HUB_USERNAME}/backend:${{ ENV.IMAGE_TAG }}|" ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git config --global user.email "L00187534@atu.ie"
           git config --global user.name "vinay187534"
           git checkout ${GITHUB_REF_NAME}
+          git pull origin ${GITHUB_REF_NAME} --rebase
           git add ./Kubernetes-Manifest-Files/Backend/deployment.yaml
           git commit -m "Update backend image tag to ${{ ENV.IMAGE_TAG }}"
-          git push https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME}
+          git push --force https://${{ secrets.G_TOKEN }}@github.com/${{ github.repository }} HEAD:${GITHUB_REF_NAME}
 
   deploy-on-EKS:
     needs: build
