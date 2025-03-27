@@ -1,4 +1,4 @@
-# Stage 1: Build stage
+# Stage 1: Build stages
 FROM maven:3.9.6-eclipse-temurin-21 as build
 
 # Set the working directory inside the container
