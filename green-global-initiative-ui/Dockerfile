@@ -1,4 +1,4 @@
-# Stage 1: Build Angular app
+# Stage 1: Build Angular apps
 FROM node:18-alpine AS build
  
 # Set working directory
