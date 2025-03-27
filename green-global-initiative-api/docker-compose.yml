@@ -24,7 +24,7 @@ services:
     build:
       context: .
       args:
-        PROFILE: development  # Set the profile during build time
+        PROFILE: development  # Set the profile during build times
     image: athuls1195/nggi-springboot:latest
     container_name: springboot_app
     restart: always
