@@ -1,16 +1,16 @@
-# Stage 1: Build Angular app
+# Stage 1: Build Angular application
 FROM node:18-alpine AS build
  
-# Set working directory
+# Set working directory inside the container
 WORKDIR /app
  
 # Copy package.json and package-lock.json
 COPY package*.json ./
  
-# Install dependencies
+# Install dependencies needed
 RUN npm ci 
  
-# Copy the rest of the application code
+# Copy the rest of the application code folder
 COPY . .
  
 # Build the Angular app for production (for later use in the production stage)
@@ -19,7 +19,7 @@ RUN npm run build -- --configuration=development
 # Stage 2: Development Stage with Node.js (only for development mode)
 FROM node:18-alpine AS development
  
-# Set working directory for the Angular app
+# Set working directory for the Angular
 WORKDIR /app
  
 # Install dependencies for the Angular app (just in case any are needed for development)
